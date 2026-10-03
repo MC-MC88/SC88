@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#F6CE22">
+<title>SC88 — Simple Calculator by MC88</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Fredoka:wght@400;600&family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  /* ========== RESET & BASE ========== */
+  *{
+    margin:0; padding:0;
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+  }
+  html, body{ height:100%; width:100%; overflow:hidden; }
+  body{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    user-select:none;
+    touch-action: manipulation;
+    transition: background 0.6s ease, color 0.6s ease;
+    background-color: #F6CE22;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* ========== LAYOUT ========== */
+  .app{
+    width:100%;
+    max-width:640px;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    padding: clamp(12px, 2.5vh, 30px) clamp(12px, 2.5vw, 30px);
+    gap: clamp(8px, 1.5vh, 20px);
+  }
+
+  /* ========== HEADER & THEME SWITCHER ========== */
+  .header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+    padding: 0 4px;
+  }
+  .brand h1{
+    font-size: clamp(18px, 2.5vh, 26px);
+    font-weight:800;
+    letter-spacing:0.05em;
+  }
+  .brand p{
+    font-size: clamp(8px, 1.2vh, 11px);
+    font-weight:600;
+    letter-spacing:0.15em;
+    opacity:0.7;
+  }
+  .theme-btn{
+    background: transparent;
+    border: 2px solid currentColor;
+    color: inherit;
+    padding: clamp(6px, 1vh, 12px) clamp(10px, 1.5vw, 20px);
+    font-family: inherit;
+    font-weight: 700;
+    font-size: clamp(10px, 1.5vh, 14px);
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 6px;
+  }
+  .theme-btn:hover{
+    opacity: 0.7;
+    transform: scale(0.98);
+  }
+  .theme-btn:active{
+    transform: scale(0.95);
+  }
+
+  /* ========== DISPLAY ========== */
+  .display{
+    flex: 1 1 0;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    justify-content:flex-end;
+    padding: clamp(12px, 2vh, 26px) clamp(16px, 3vw, 30px);
+    gap: clamp(4px, 1vh, 10px);
+    transition: all 0.6s ease;
+    overflow:hidden;
+  }
+  .expression{
+    font-size: clamp(12px, 2vh, 18px);
+    font-weight:600;
+    letter-spacing:0.03em;
+    min-height:1.2em;
+    max-width:100%;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    transition: all 0.6s ease;
+  }
+  .result{
+    font-size: clamp(32px, min(9vh, 15vw), 76px);
+    font-weight:700;
+    letter-spacing:-0.02em;
+    line-height:1.05;
+    max-width:100%;
+    white-space:nowrap;
+    overflow:hidden;
+    transition: font-size 0.12s ease;
+  }
+  .result.small{ font-size: clamp(26px, min(7vh, 12vw), 60px); }
+  .result.tiny { font-size: clamp(20px, min(5.4vh, 9vw), 46px); }
+
+  /* ========== KEYPAD ========== */
+  .keys{
+    flex: 2.4 1 0;
+    min-height:0;
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: clamp(6px, 1.2vh, 14px);
+  }
+
+  .key{
+    border:none;
+    font-family:inherit;
+    font-size: clamp(16px, min(3.5vh, 6vw), 28px);
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+  .key:active, .key.pressed{
+    transform: translateY(2px);
+  }
+  .key.zero{ grid-column: span 2; }
+
+  /* ==========================================================
+     THEME 1: MINIMALIST BLUE & ORANGE (Image 1)
+     ========================================================== */
+  .theme-1 {
+    background: #4A90E2;
+    color: #1A2E4A;
+  }
+  .theme-1 .brand h1 { font-family: 'Inter', sans-serif; letter-spacing: 0.15em; }
+  .theme-1 .brand p { font-family: 'Inter', sans-serif; font-weight: 300; letter-spacing: 0.25em; }
+  .theme-1 .theme-btn { border-color: #1A2E4A; color: #1A2E4A; border-radius: 20px; }
+  .theme-1 .display {
+    background: #FFFFFF;
+    border-radius: 24px;
+    box-shadow: 0 8px 0 rgba(0,0,0,0.1);
+    color: #1A2E4A;
+  }
+  .theme-1 .expression { color: #8FA8C8; }
+  .theme-1 .result { color: #1A2E4A; }
+  .theme-1 .key {
+    background: #EAF2F8;
+    color: #1A2E4A;
+    border-radius: 16px;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+  }
+  .theme-1 .key.fn { background: #F5A623; color: #FFFFFF; box-shadow: 0 4px 0 #C28215; }
+  .theme-1 .key.op { background: #F5A623; color: #FFFFFF; font-weight: 800; box-shadow: 0 4px 0 #C28215; }
+
+  /* ==========================================================
+     THEME 2: TERRACOTTA & GRAIN (Image 2)
+     ========================================================== */
+  .theme-2 {
+    background: #D96C4A;
+    color: #F2E8D5;
+  }
+  .theme-2 .brand h1 { font-family: 'Courier Prime', monospace; letter-spacing: 0.05em; }
+  .theme-2 .brand p { font-family: 'Courier Prime', monospace; font-size: 10px; }
+  .theme-2 .theme-btn { border-color: #F2E8D5; color: #F2E8D5; border-radius: 4px; font-family: 'Courier Prime', monospace; }
+  .theme-2 .display {
+    background: #BA5233;
+    border-radius: 8px;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+    color: #8BC34A;
+  }
+  .theme-2 .expression { color: #A8C98E; }
+  .theme-2 .result { color: #8BC34A; font-family: 'Courier Prime', monospace; }
+  .theme-2 .key {
+    background: #F2E8D5;
+    color: #4A2A1A;
+    border-radius: 6px;
+    box-shadow: 0 3px 0 #C4B8A5;
+    font-family: 'Courier Prime', monospace;
+  }
+  .theme-2 .key.fn { background: #6B8E5A; color: #F2E8D5; box-shadow: 0 3px 0 #4A6B3A; }
+  .theme-2 .key.op { background: #6B8E5A; color: #F2E8D5; box-shadow: 0 3px 0 #4A6B3A; }
+
+  /* ==========================================================
+     THEME 3: VINTAGE SEPIA (Image 3)
+     ========================================================== */
+  .theme-3 {
+    background: #5C4033;
+    color: #E8DCC8;
+  }
+  .theme-3 .brand h1 { font-family: 'Playfair Display', serif; font-weight: 700; }
+  .theme-3 .brand p { font-family: 'Playfair Display', serif; font-style: italic; }
+  .theme-3 .theme-btn { border-color: #E8DCC8; color: #E8DCC8; border-radius: 2px; font-family: 'Playfair Display', serif; }
+  .theme-3 .display {
+    background: #F4EEDF;
+    border: 4px solid #8B7355;
+    border-radius: 4px;
+    color: #4A3A2A;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+  }
+  .theme-3 .expression { color: #A89880; font-family: 'Playfair Display', serif; }
+  .theme-3 .result { color: #4A3A2A; font-family: 'Playfair Display', serif; }
+  .theme-3 .key {
+    background: #F4EEDF;
+    color: #4A3A2A;
+    border: 2px solid #8B7355;
+    border-radius: 4px;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+    font-family: 'Playfair Display', serif;
+  }
+  .theme-3 .key.fn { background: #8B7355; color: #F4EEDF; border-color: #5C4033; }
+  .theme-3 .key.op { background: #6B8E8A; color: #F4EEDF; border-color: #4A6B6A; }
+
+  /* ==========================================================
+     THEME 4: TAROT TEAL (Image 4)
+     ========================================================== */
+  .theme-4 {
+    background: #4A6B6F;
+    color: #E8E4D9;
+  }
+  .theme-4 .brand h1 { font-family: 'Cinzel', serif; font-weight: 700; letter-spacing: 0.1em; }
+  .theme-4 .brand p { font-family: 'Georgia', serif; font-size: 11px; font-style: italic; }
+  .theme-4 .theme-btn { border-color: #E8E4D9; color: #E8E4D9; border-radius: 4px; font-family: 'Cinzel', serif; }
+  .theme-4 .display {
+    background: #F5F2EB;
+    border: 3px solid #2C3E40;
+    border-radius: 4px;
+    color: #2C3E40;
+    box-shadow: 0 0 0 6px #F5F2EB, 0 0 0 8px #2C3E40;
+    margin: 10px 0;
+  }
+  .theme-4 .expression { color: #8C9E9F; font-family: 'Georgia', serif; }
+  .theme-4 .result { color: #2C3E40; font-family: 'Cinzel', serif; font-weight: 700; }
+  .theme-4 .key {
+    background: #F5F2EB;
+    color: #2C3E40;
+    border: 2px solid #2C3E40;
+    border-radius: 4px;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.2);
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+  }
+  .theme-4 .key.fn { background: #8C9E9F; color: #F5F2EB; border-color: #2C3E40; }
+  .theme-4 .key.op { background: #6B8E5A; color: #F5F2EB; border-color: #2C3E40; }
+
+  /* ==========================================================
+     THEME 5: PINK POP-ART (Image 5)
+     ========================================================== */
+  .theme-5 {
+    background: #E58EA5;
+    color: #1A1A1A;
+  }
+  .theme-5 .brand h1 { font-family: 'Fredoka', sans-serif; letter-spacing: 0.05em; }
+  .theme-5 .brand p { font-family: 'Fredoka', sans-serif; font-weight: 400; letter-spacing: 0.1em; }
+  .theme-5 .theme-btn { border-color: #1A1A1A; color: #1A1A1A; border-radius: 30px; font-family: 'Fredoka', sans-serif; border-width: 3px; }
+  .theme-5 .display {
+    background: #FFFFFF;
+    border: 4px solid #1A1A1A;
+    border-radius: 20px;
+    color: #1A1A1A;
+    box-shadow: 8px 8px 0 #1A1A1A;
+  }
+  .theme-5 .expression { color: #999999; font-family: 'Fredoka', sans-serif; }
+  .theme-5 .result { color: #1A1A1A; font-family: 'Fredoka', sans-serif; }
+  .theme-5 .key {
+    background: #FFFFFF;
+    color: #1A1A1A;
+    border: 4px solid #1A1A1A;
+    border-radius: 16px;
+    box-shadow: 4px 4px 0 #1A1A1A;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+  }
+  .theme-5 .key:active { box-shadow: 0 0 0 #1A1A1A; transform: translate(4px, 4px); }
+  .theme-5 .key.fn { background: #FDE8ED; color: #1A1A1A; }
+  .theme-5 .key.op { background: #F4A0B5; color: #1A1A1A; }
+
+  /* ========== SHORT SCREENS ========== */
+  @media (max-height: 600px) {
+    .brand p { display: none; }
+    .display { border-radius: 12px; }
+    .theme-4 .display { margin: 0; }
+    .theme-5 .display { margin: 4px 0; }
+  }
+</style>
+</head>
+<body class="theme-1">
+
+<main class="app">
+
+  <header class="header">
+    <div class="brand">
+      <h1>SC88</h1>
+      <p>SIMPLE CALCULATOR BY MC88</p>
+    </div>
+    <button class="theme-btn" id="themeToggle" aria-label="Switch Theme">SWITCH THEME</button>
+  </header>
+
+  <section class="display" aria-live="polite">
+    <div class="expression" id="expression"></div>
+    <div class="result" id="result">0</div>
+  </section>
+
+  <section class="keys" id="keys">
+    <button class="key fn" data-action="clear" aria-label="All clear">AC</button>
+    <button class="key fn del-icon" data-action="backspace" aria-label="Delete digit">⌫</button>
+    <button class="key fn" data-action="percent" aria-label="Percent">%</button>
+    <button class="key op" data-op="/" aria-label="Divide">÷</button>
+
+    <button class="key" data-digit="7">7</button>
+    <button class="key" data-digit="8">8</button>
+    <button class="key" data-digit="9">9</button>
+    <button class="key op" data-op="*" aria-label="Multiply">×</button>
+
+    <button class="key" data-digit="4">4</button>
+    <button class="key" data-digit="5">5</button>
+    <button class="key" data-digit="6">6</button>
+    <button class="key op" data-op="-" aria-label="Subtract">−</button>
+
+    <button class="key" data-digit="1">1</button>
+    <button class="key" data-digit="2">2</button>
+    <button class="key" data-digit="3">3</button>
+    <button class="key op" data-op="+" aria-label="Add">+</button>
+
+    <button class="key zero" data-digit="0">0</button>
+    <button class="key" data-action="dot" aria-label="Decimal point">.</button>
+    <button class="key op" data-action="equals" aria-label="Equals">=</button>
+  </section>
+
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- theme switcher ---------------- */
+  const body = document.body;
+  const themeToggle = document.getElementById("themeToggle");
+  let themeIndex = 1;
+  const totalThemes = 5;
+
+  themeToggle.addEventListener("click", () => {
+    themeIndex = (themeIndex % totalThemes) + 1;
+    body.className = `theme-${themeIndex}`;
+    vibrate();
+  });
+
+  /* ---------------- elements ---------------- */
+  const resultEl = document.getElementById("result");
+  const exprEl   = document.getElementById("expression");
+  const keysEl   = document.getElementById("keys");
+
+  /* ---------------- state ---------------- */
+  const state = {
+    current: "0",
+    previous: null,
+    operator: null,
+    waiting: false,
+    justEvaluated: false,
+    expression: "",
+    error: false
+  };
+
+  const SYMBOL = { "+": "+", "-": "−", "*": "×", "/": "÷" };
+
+  /* ---------------- helpers ---------------- */
+  function round(n) {
+    return Math.round((n + Number.EPSILON) * 1e10) / 1e10;
+  }
+
+  function numToString(n) {
+    if (!isFinite(n)) return "Error";
+    const r = round(n);
+    if (Math.abs(r) >= 1e12 || (r !== 0 && Math.abs(r) < 1e-9)) {
+      return r.toExponential(6);
+    }
+    return String(r);
+  }
+
+  function formatDisplay(str) {
+    if (str === "Error" || str.includes("e")) return str;
+    const neg = str.startsWith("-");
+    const bodyStr = neg ? str.slice(1) : str;
+    const parts = bodyStr.split(".");
+    const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    let out = (neg ? "-" : "") + intPart;
+    if (parts[1] !== undefined) out += "." + parts[1];
+    return out;
+  }
+
+  function digitCount(str) {
+    return str.replace(/[-.]/g, "").length;
+  }
+
+  function compute(a, b, op) {
+    let r;
+    switch (op) {
+      case "+": r = a + b; break;
+      case "-": r = a - b; break;
+      case "*": r = a * b; break;
+      case "/": if (b === 0) return null; r = a / b; break;
+      default:  return null;
+    }
+    if (!isFinite(r)) return null;
+    return round(r);
+  }
+
+  /* ---------------- haptic feedback ---------------- */
+  function vibrate() {
+    if ("vibrate" in navigator) {
+      navigator.vibrate(20);
+    }
+  }
+
+  /* ---------------- rendering ---------------- */
+  function render() {
+    if (state.error) {
+      resultEl.textContent = "Error";
+      exprEl.textContent = "";
+      resultEl.className = "result small";
+      return;
+    }
+
+    const text = formatDisplay(state.current);
+    resultEl.textContent = text;
+    exprEl.textContent = state.expression;
+
+    const len = text.length;
+    resultEl.className = "result" +
+      (len > 12 ? " tiny" : len > 9 ? " small" : "");
+  }
+
+  function setError() {
+    state.error = true;
+    state.expression = "";
+    state.previous = null;
+    state.operator = null;
+    state.waiting = true;
+    render();
+  }
+
+  /* ---------------- actions ---------------- */
+  function clearAll() {
+    state.current = "0";
+    state.previous = null;
+    state.operator = null;
+    state.waiting = false;
+    state.justEvaluated = false;
+    state.expression = "";
+    state.error = false;
+    render();
+  }
+
+  function startFreshIfNeeded() {
+    if (state.justEvaluated) {
+      state.expression = "";
+      state.previous = null;
+      state.operator = null;
+      state.justEvaluated = false;
+    }
+  }
+
+  function inputDigit(d) {
+    if (state.error) return;
+
+    if (state.waiting) {
+      state.current = d;
+      state.waiting = false;
+      startFreshIfNeeded();
+    } else {
+      if (state.current === "0") state.current = d;
+      else if (digitCount(state.current) < 12) state.current += d;
+    }
+    render();
+  }
+
+  function inputDot() {
+    if (state.error) return;
+
+    if (state.waiting) {
+      state.current = "0.";
+      state.waiting = false;
+      startFreshIfNeeded();
+    } else if (!state.current.includes(".")) {
+      state.current += ".";
+    }
+    render();
+  }
+
+  function backspace() {
+    if (state.error) { clearAll(); return; }
+    if (state.waiting) return;
+
+    state.current = state.current.slice(0, -1);
+    if (state.current === "" || state.current === "-") state.current = "0";
+    render();
+  }
+
+  function percent() {
+    if (state.error) return;
+    const v = parseFloat(state.current) / 100;
+    state.current = numToString(v);
+    state.waiting = false;
+    render();
+  }
+
+  function chooseOperator(op) {
+    if (state.error) return;
+
+    const value = parseFloat(state.current);
+
+    if (state.operator !== null && !state.waiting) {
+      const res = compute(state.previous, value, state.operator);
+      if (res === null) { setError(); return; }
+      state.previous = res;
+      state.current = numToString(res);
+    } else {
+      state.previous = value;
+    }
+
+    state.operator = op;
+    state.waiting = true;
+    state.justEvaluated = false;
+    state.expression =
+      formatDisplay(numToString(state.previous)) + " " + SYMBOL[op];
+    render();
+  }
+
+  function equals() {
+    if (state.error) return;
+    if (state.operator === null) return;
+
+    const a = state.previous;
+    const b = state.waiting ? state.previous : parseFloat(state.current);
+
+    const res = compute(a, b, state.operator);
+    if (res === null) { setError(); return; }
+
+    state.expression =
+      formatDisplay(numToString(a)) + " " + SYMBOL[state.operator] + " " +
+      formatDisplay(numToString(b)) + " =";
+
+    state.current = numToString(res);
+    state.previous = null;
+    state.operator = null;
+    state.waiting = true;
+    state.justEvaluated = true;
+    render();
+  }
+
+  /* ---------------- click handling ---------------- */
+  keysEl.addEventListener("click", function (e) {
+    const btn = e.target.closest("button.key");
+    if (!btn) return;
+
+    vibrate();
+
+    if (btn.dataset.digit !== undefined)      inputDigit(btn.dataset.digit);
+    else if (btn.dataset.op !== undefined)    chooseOperator(btn.dataset.op);
+    else {
+      switch (btn.dataset.action) {
+        case "clear":     clearAll();   break;
+        case "backspace": backspace();  break;
+        case "percent":   percent();    break;
+        case "dot":       inputDot();   break;
+        case "equals":    equals();     break;
+      }
+    }
+  });
+
+  /* ---------------- keyboard ---------------- */
+  function flash(el) {
+    if (!el) return;
+    el.classList.add("pressed");
+    setTimeout(() => el.classList.remove("pressed"), 110);
+  }
+
+  const find = (sel) => keysEl.querySelector(sel);
+
+  document.addEventListener("keydown", function (e) {
+    const k = e.key;
+    let btn = null;
+
+    if (/^[0-9]$/.test(k) || k === "." || k === "," || k === "+" || k === "-" || k === "*" || k === "/" || k === "x" || k === "X" || k === "Enter" || k === "=" || k === "Escape" || k === "c" || k === "C" || k === "Backspace" || k === "%") {
+      vibrate();
+    }
+
+    if (/^[0-9]$/.test(k)) {
+      inputDigit(k);
+      btn = find('[data-digit="' + k + '"]');
+    } else if (k === "." || k === ",") {
+      e.preventDefault();
+      inputDot();
+      btn = find('[data-action="dot"]');
+    } else if (k === "+" || k === "-" || k === "*" || k === "/") {
+      chooseOperator(k);
+      btn = find('[data-op="' + k + '"]');
+    } else if (k === "x" || k === "X") {
+      chooseOperator("*");
+      btn = find('[data-op="*"]');
+    } else if (k === "Enter" || k === "=") {
+      e.preventDefault();
+      equals();
+      btn = find('[data-action="equals"]');
+    } else if (k === "Escape" || k === "c" || k === "C") {
+      clearAll();
+      btn = find('[data-action="clear"]');
+    } else if (k === "Backspace") {
+      e.preventDefault();
+      backspace();
+      btn = find('[data-action="backspace"]');
+    } else if (k === "%") {
+      percent();
+      btn = find('[data-action="percent"]');
+    } else {
+      return;
+    }
+
+    flash(btn);
+  });
+
+  /* ---------------- init ---------------- */
+  render();
+})();
+</script>
+</body>
+</html>
