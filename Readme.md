@@ -162,16 +162,16 @@ Very narrow screens — under 320 pixels — can push the display beyond its con
 
 <div align="center">
 
-📞 A question, an idea, a bug?
+### 📞 Une question, une idée ? / A question, an idea?
 
-https://img.shields.io/badge/Email-mohamed005cheikh@gmail.com-d14836?style=flat-square&logo=gmail&logoColor=white
-https://img.shields.io/badge/WhatsApp-+222_30_73_64_75-25D366?style=flat-square&logo=whatsapp&logoColor=white
-https://img.shields.io/badge/GitHub-mohamed005cheikh--rgb-181717?style=flat-square&logo=github
+[![Email](https://img.shields.io/badge/Email-mohamed005cheikh@gmail.com-d14836?style=flat-square&logo=gmail&logoColor=white)](mailto:mohamed005cheikh@gmail.com)
+[![WhatsApp](https://img.shields.io/badge/WhatsApp-+222_30_72_64_75-25D366?style=flat-square&logo=whatsapp&logoColor=white)](https://wa.me/22230726475)
+[![GitHub](https://img.shields.io/badge/GitHub-MC-MC88-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/MC-MC88)
 
 <br />
 
-Cinq humeurs. Une seule arithmétique.
+*MC88*
 
-<sub>© 2026 Mohamed Cheikh — MC88</sub>
+<sub>MIT License · © 2026 Mohamed Cheikh — MC88</sub>
 
 </div>
